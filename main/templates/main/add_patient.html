@@ -1,0 +1,223 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Admit New Patient - HK Super Multi-Specialty Hospital{% endblock %}
+
+{% block contentTitle %}
+    <i class="fas fa-user-plus mr-2 text-success"></i>Clinical Admission Ingestion Panel
+{% endblock contentTitle %}
+
+{% block content %}
+<div class="card glass-card p-4 mb-4 shadow-lg" style="border-radius: 16px;">
+    <form action="" method="post">
+    {% csrf_token %}
+        
+        <h5 class="text-info font-weight-bold mb-3"><i class="fas fa-id-card-alt mr-2"></i>I. Patient Identity & Demographics</h5>
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Patient Full Legal Name</label>
+                <input type="text" class="form-control bg-dark text-white border-secondary" name="name" placeholder="Enter patient name" required style="border-radius: 8px;">
+            </div>
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Primary Contact Number</label>
+                <input type="text" class="form-control bg-dark text-white border-secondary" name="phone_num" placeholder="10-digit mobile number" required style="border-radius: 8px;">
+            </div>
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Patient Age (Years)</label>
+                <input type="number" class="form-control bg-dark text-white border-secondary font-weight-bold" name="age" min="0" max="125" placeholder="e.g., 23" required style="border-radius: 8px;">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Emergency Contact / Next of Kin Name</label>
+                <input type="text" class="form-control bg-dark text-white border-secondary" name="patient_relative_name" placeholder="Relative or guardian full name" required style="border-radius: 8px;">
+            </div>
+            <div class="form-group col-md-6">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Next of Kin Urgent Mobile Link</label>
+                <input type="text" class="form-control bg-dark text-white border-secondary" name="patient_relative_contact" placeholder="Emergency telephone contact" required style="border-radius: 8px;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="font-weight-bold text-muted small uppercase tracking-wider">Permanent Residential Address</label>
+            <textarea class="form-control bg-dark text-white border-secondary" name="address" rows="2" placeholder="Complete resident layout details..." required style="border-radius: 8px;"></textarea>
+        </div>
+
+        <div class="seperator my-4" style="height:1px; background: rgba(255,255,255,0.08);"></div>
+
+        <h5 class="text-success font-weight-bold mb-3"><i class="fas fa-stethoscope mr-2"></i>II. Specialty Allocation & Clinical Triage</h5>
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Initial Triage Allocation Bracket</label>
+                <select class="form-control bg-dark text-white font-weight-bold border-warning" name="status" id="status" style="border-radius: 8px;">
+                    <option value="Admitted" class="text-white">General Ward Admission</option>
+                    <option value="Recovering" class="text-white">Step-Down Observational Unit</option>
+                    <option value="Critical" class="text-white">🚨 High-Tier Intensive Care (ICU)</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Allocate Facility Bed Unit</label>
+                <select name="bed_num" class="form-control bg-dark text-white font-weight-bold border-secondary" id="bed_num" required style="border-radius: 8px;">
+                    {% for bed in beds %}
+                        <option value="{{ bed.id }}">{{ bed.bed_number }} [{{ bed.get_ward_type_display }}]</option>
+                    {% empty %}
+                        <option value="" disabled>⚠️ No Free Bed Units Available in Any Ward Fleet</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Assign Attending Physician (MBBS/MD/MS)</label>
+                <select class="form-control bg-dark text-white font-weight-bold border-secondary" name="doctor" id="doctor" required style="border-radius: 8px;">
+                    {% for doctor in doctors %}
+                        <option value="{{ doctor.id }}">{{ doctor.name }} [{{ doctor.qualification }}]</option>
+                    {% empty %}
+                        <option value="" disabled>No Physicians Assigned onto Local Shift Rotation</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Initial Verified Pathology / Disease Diagnosis</label>
+                <input type="text" class="form-control bg-dark text-white border-info font-weight-bold" name="active_diagnosis" placeholder="e.g., Acute Appendicitis, Stroke, Bone Fracture" required style="border-radius: 8px;">
+            </div>
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Order Initial Diagnostics / Labs</label>
+                <input type="text" class="form-control bg-dark text-white border-secondary" name="ordered_diagnostics" placeholder="e.g., CBC Blood Test, X-Ray, CT Scan" style="border-radius: 8px;">
+            </div>
+            <div class="form-group col-md-4">
+                <label class="font-weight-bold text-muted small uppercase tracking-wider">Advance Deposit Admission Fee (₹)</label>
+                <input type="number" step="0.01" class="form-control bg-dark text-white border-success font-weight-bold" name="bill_amount" value="0.00" style="border-radius: 8px;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="font-weight-bold text-muted small uppercase tracking-wider">Prior Medical History / Baseline Comorbidities</label>
+            <input type="text" class="form-control bg-dark text-white border-secondary" name="prior_ailments" placeholder="e.g., Type-2 Diabetes Mellitus, Chronic Hypertension, None" style="border-radius: 8px;">
+        </div>
+
+        <div class="seperator my-4" style="height:1px; background: rgba(255,255,255,0.08);"></div>
+
+        <div class="card bg-dark border p-4" style="border-radius: 12px; border-color: rgba(255,255,255,0.08) !important;">
+            <h6 class="text-center font-weight-bold text-white mb-4" style="font-size: 1.15em; letter-spacing: 0.5px;">
+                <i class="fas fa-network-wired mr-2 text-info"></i>A-to-Z Multi-Specialty Symptom Presentation Check-ledger
+            </h6>
+            
+            <div class="row text-white" style="font-size: 0.9em; line-height: 1.7;">
+                
+                <div class="col-xl-3 col-lg-6 mb-4 border-right border-secondary" style="border-right-style: dashed !important;">
+                    <span class="badge badge-success mb-3 p-2 w-100 text-left" style="font-size:0.95em; background-color: #15803d !important;">
+                        <i class="fas fa-bed mr-2"></i> Common General Ward Wards
+                    </span>
+                    <div class="pl-1">
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Fever" class="mr-2"> Fever / Pyrexia</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Mild to Moderate Headache" class="mr-2"> Mild/Moderate Headache</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Body pain" class="mr-2"> Generalized Body Pain</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Fatigue" class="mr-2"> Lethargy & Fatigue</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Weakness" class="mr-2"> Systemic Weakness</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Chills" class="mr-2"> Chills / Rigors</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Loss of appetite" class="mr-2"> Loss of Appetite</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Weight Loss" class="mr-2"> Non-Serious Weight Loss</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Dizziness" class="mr-2"> Mild Dizziness / Vertigo</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Lightheadedness" class="mr-2"> Lightheadedness</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Sleep Disturbance" class="mr-2"> Sleep Disturbance</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Mild Anxiety" class="mr-2"> Mild Anxiety / Stress</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Cough" class="mr-2"> Productive/Dry Cough</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Cold" class="mr-2"> Common Cold Signs</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Runny Nose" class="mr-2"> Runny Nose / Rhinorrhea</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Sneezing" class="mr-2"> Persistent Sneezing</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Sore throat" class="mr-2"> Sore Throat / Tonsils</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Hoarseness" class="mr-2"> Voice Hoarseness</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Mild Breathlessness" class="mr-2"> Mild Breathlessness</label>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-6 mb-4 border-right border-secondary" style="border-right-style: dashed !important;">
+                    <span class="badge badge-info mb-3 p-2 w-100 text-left" style="font-size:0.95em; background-color: #0369a1 !important;">
+                        <i class="fas fa-hand-holding-medical mr-2"></i> Primary & Digestive Care
+                    </span>
+                    <div class="pl-1">
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Vomiting" class="mr-2"> Nausea & Vomiting</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Diarrhea" class="mr-2"> Diarrhea Loose Motions</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Constipation" class="mr-2"> Acute Constipation</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Stomach pain" class="mr-2"> Abdominal Pain Cramps</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Gastric Acidity" class="mr-2"> Gastric Hyper-Acidity</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Indigestion" class="mr-2"> Indigestion / Dyspepsia</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Bloating" class="mr-2"> Abdominal Bloating</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Dehydration" class="mr-2"> Mild/Moderate Dehydration</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Skin rash" class="mr-2"> Dermatological Skin Rash</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Itching" class="mr-2"> Severe Pruritus / Itching</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Allergies" class="mr-2"> Seasonal Allergies</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Hives" class="mr-2"> Urticaria / Hives</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Minor Fungal Infection" class="mr-2"> Minor Fungal Infection</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Acne" class="mr-2"> Acne Vulgaris Eruptions</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Back Pain" class="mr-2"> Lumbar Back Pain</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Neck Pain" class="mr-2"> Cervical Neck Pain</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Joint pain" class="mr-2"> Joint / Articular Pain</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Muscle Pain" class="mr-2"> Myalgia / Muscle Pain</label>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-6 mb-4 border-right border-secondary" style="border-right-style: dashed !important;">
+                    <span class="badge badge-warning mb-3 p-2 w-100 text-left text-dark" style="font-size:0.95em; background-color: #eab308 !important;">
+                        <i class="fas fa-heartbeat mr-2"></i> Organ Super-Specialties
+                    </span>
+                    <div class="pl-1">
+                        <label class="d-block text-warning font-weight-bold"><input type="checkbox" name="symptoms" value="Chest pain" class="mr-2"> Chest Pain / Angina</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Palpitations" class="mr-2"> Heart Palpitations</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Shortness of breath" class="mr-2"> Dyspnea / Short Breath</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Swollen legs" class="mr-2"> Peripheral Edema Swelling</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Skin redness" class="mr-2"> Erythema / Skin Redness</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Dry skin" class="mr-2"> Chronic Dry Skin</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Hair loss" class="mr-2"> Alopecia / Sudden Hair Loss</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Pigmentation" class="mr-2"> Epidermal Pigmentation</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Excessive thirst" class="mr-2"> Polydipsia / Excess Thirst</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Weight gain" class="mr-2"> Unexplained Weight Gain</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Weight loss" class="mr-2"> Rapid Weight Loss Profile</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Increased urination" class="mr-2"> Polyuria / Urination Frequency</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Muscle Cramps" class="mr-2"> Localized Muscle Cramps</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Minor Sprains" class="mr-2"> Extremity Minor Sprains</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Burning Urination" class="mr-2"> Dysuria / Burning Urination</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Frequent Urination" class="mr-2"> Frequent Urinary urgencies</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Mild Urinary Infection" class="mr-2"> Mild Urinary Infection</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Joint swelling" class="mr-2"> Rheumatoid Joint Swelling</label>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-6 mb-4">
+                    <span class="badge badge-danger mb-3 p-2 w-100 text-left" style="font-size:0.95em; background-color: #dc2626 !important;">
+                        <i class="fas fa-biohazard mr-2"></i> Surgical, Special & Trauma ICU
+                    </span>
+                    <div class="pl-1">
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Severe headache" class="mr-2"> Intense Neurological Headache</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Memory loss" class="mr-2"> Cognitive Memory Loss</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Numbness" class="mr-2"> Paresthesia / Body Numbness</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Seizures" class="mr-2"> Epileptic Fits & Seizures</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Wheezing" class="mr-2"> Asthmatic Pulmonary Wheezing</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Breathing difficulty" class="mr-2"> Acute Respiratory Failure</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Chest tightness" class="mr-2"> Pulmonary Chest Tightness</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Reduced urine" class="mr-2"> Oliguria / Reduced Urine Output</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="High BP" class="mr-2"> Malignant High Blood Pressure</label>
+                        <label class="d-block"><input type="checkbox" name="symptoms" value="Stiffness" class="mr-2"> Musculoskeletal Stiffness</label>
+                        <label class="d-block text-danger font-weight-bold"><input type="checkbox" name="symptoms" value="Hernia bulge" class="mr-2"> Intestinal Hernia Bulge</label>
+                        <label class="d-block text-danger font-weight-bold"><input type="checkbox" name="symptoms" value="Trauma" class="mr-2"> Polytrauma Soft Tissue Crush</label>
+                        <label class="d-block text-danger font-weight-bold"><input type="checkbox" name="symptoms" value="Head injury" class="mr-2"> Traumatic Brain Head Injury</label>
+                        <label class="d-block text-danger font-weight-bold"><input type="checkbox" name="symptoms" value="Brain tumor symptoms" class="mr-2"> Intracranial Masses Signs</label>
+                        <label class="d-block text-danger font-weight-bold"><input type="checkbox" name="symptoms" value="Paralysis" class="mr-2"> Hemiplegia Stroke Paralysis</label>
+                        <label class="d-block text-danger font-weight-bold"><input type="checkbox" name="symptoms" value="Severe bleeding" class="mr-2"> Hemorrhagic Profuse Bleeding</label>
+                        <label class="d-block text-danger font-weight-bold"><input type="checkbox" name="symptoms" value="Unconsciousness" class="mr-2"> Unresponsive Comatose State</label>
+                        <label class="d-block text-danger font-weight-bold"><input type="checkbox" name="symptoms" value="Poisoning" class="mr-2"> Toxicology Overdose / Poisoning</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block mt-4 font-weight-bold shadow-md" style="border-radius: 50px; padding: 14px; font-size: 1.15em; letter-spacing: 0.5px;">
+            Authorize Patient Admission Frame & Deploy Core Resources ➔
+        </button>
+    </form>
+</div>
+{% endblock content %}

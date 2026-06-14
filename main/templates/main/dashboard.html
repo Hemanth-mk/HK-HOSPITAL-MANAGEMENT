@@ -1,0 +1,156 @@
+{% extends 'main/base.html' %}
+
+{% block title %}HK Hospital - Executive Command Matrix{% endblock %}
+
+{% block contentTitle %}📊 Clinical Infrastructure Command Matrix{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card glass-card p-3 h-100 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-uppercase text-muted font-weight-bold tracking-wider small">EHR Lifelong Records</span>
+                        <h2 class="font-weight-bold text-white mt-1 mb-0">{{ total_patients }}</h2>
+                    </div>
+                    <div class="p-3 rounded-circle bg-primary-transparent" style="background: rgba(2, 132, 199, 0.15);"><i class="fas fa-server text-info fa-lg"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card glass-card p-3 h-100 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-uppercase text-muted font-weight-bold tracking-wider small">Active Inpatients</span>
+                        <h2 class="font-weight-bold text-warning mt-1 mb-0">{{ admitted_count }}</h2>
+                    </div>
+                    <div class="p-3 rounded-circle bg-warning-transparent" style="background: rgba(245, 158, 11, 0.15);"><i class="fas fa-user-injured text-warning fa-lg"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card glass-card p-3 h-100 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-uppercase text-muted font-weight-bold tracking-wider small">Available Beds Pool</span>
+                        <h2 class="font-weight-bold text-success mt-1 mb-0">{{ beds_available }} <span class="small font-weight-normal text-muted">/ {{ total_beds }}</span></h2>
+                    </div>
+                    <div class="p-3 rounded-circle bg-success-transparent" style="background: rgba(16, 185, 129, 0.15);"><i class="fas fa-procedures text-success fa-lg"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card glass-card p-3 h-100 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-uppercase text-muted font-weight-bold tracking-wider small">Discharged Safely</span>
+                        <h2 class="font-weight-bold text-info mt-1 mb-0">{{ recovered_count }}</h2>
+                    </div>
+                    <div class="p-3 rounded-circle bg-info-transparent" style="background: rgba(6, 182, 212, 0.15);"><i class="fas fa-heart text-info fa-lg"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card glass-card p-4 h-100 shadow-sm">
+                <h5 class="font-weight-bold text-white mb-3"><i class="fas fa-network-wired mr-2 text-info"></i>100-Bed Segment Distribution Telemetry</h5>
+                <div class="chart-container" style="position: relative; height:280px; width:100%">
+                    <canvas id="wardBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card glass-card p-4 h-100 shadow-sm">
+                <h5 class="font-weight-bold text-white mb-3"><i class="fas fa-chart-pie mr-2 text-warning"></i>Case Outcomes Allocation</h5>
+                <div class="chart-container" style="position: relative; height:280px; width:100%">
+                    <canvas id="patientPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card glass-card p-4 shadow-sm mb-4">
+        <h5 class="font-weight-bold text-white mb-3"><i class="fas fa-th mr-2 text-success"></i>Interactive Structural Resource Bed Map Ledger</h5>
+        <p class="text-muted small mt-2 mb-4">
+            <span class="badge badge-success mr-2">■ Ready / Unoccupied</span>
+            <span class="badge badge-danger">■ Occupied Clinical Asset</span>
+        </p>
+        <div class="d-flex flex-wrap" style="gap: 12px;">
+            {% for bed in beds %}
+                <div class="p-2 border rounded font-weight-bold text-center shadow-sm text-xs" 
+                     style="min-width: 100px; flex: 1 1 calc(10% - 12px); font-size: 0.8em; transition: all 0.2s;
+                            background: {% if bed.occupied %}rgba(239, 68, 68, 0.25){% else %}rgba(16, 185, 129, 0.25){% endif %};
+                            border-color: {% if bed.occupied %}rgba(239, 68, 68, 0.5){% else %}rgba(16, 185, 129, 0.5){% endif %} !important;">
+                    <i class="fas fa-bed d-block mb-1 opacity-75"></i>
+                    {{ bed.bed_number }}
+                </div>
+            {% empty %}
+                <div class="w-100 text-center text-muted py-4">No structural resource bed fleet instances registered.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Bar Chart: Bed Matrix Distribution
+        const barCtx = document.getElementById('wardBarChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ ward_labels_json|safe }},
+                datasets: [
+                    {
+                        label: 'Capacity Allocations',
+                        data: {{ ward_total_json|safe }},
+                        backgroundColor: 'rgba(2, 132, 199, 0.65)',
+                        borderColor: '#0284c7',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // 2. Pie Chart: Clinical Outcome Mix
+        const pieCtx = document.getElementById('patientPieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ pie_labels_json|safe }},
+                datasets: [{
+                    data: {{ pie_data_json|safe }},
+                    backgroundColor: ['#0284c7', '#10b981', '#ef4444', '#64748b'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 12, padding: 15 } }
+                },
+                cutout: '70%'
+            }
+        });
+    });
+</script>
+{% endblock %}

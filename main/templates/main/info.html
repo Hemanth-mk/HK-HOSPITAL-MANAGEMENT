@@ -1,0 +1,44 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Clinical Matrix Tiers - HK Hospital{% endblock %}
+
+{% block contentTitle %}🩺 Specialized Clinical Capability Branches{% endblock %}
+
+{% block content %}
+<div class="card glass-card p-4 shadow-lg" style="border-radius: 16px;">
+    <p class="text-muted mb-4">Comprehensive index of HK Super Multi-Specialty active operational care wards and diagnostic divisions.</p>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="p-3 rounded h-100" style="background: rgba(13, 21, 39, 0.5); border: 1px solid rgba(255,255,255,0.05);">
+                <h5 class="text-info font-weight-bold mb-3"><i class="fas fa-hand-holding-medical mr-2"></i>Primary & General Care Wards</h5>
+                <p class="text-white small mb-2"><strong>Departments:</strong> Family Physicians, General Practitioners (GPs), Internists, Pediatricians</p>
+                <span class="badge badge-secondary p-2">Triage Protocol Active</span>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="p-3 rounded h-100" style="background: rgba(13, 21, 39, 0.5); border: 1px solid rgba(255,255,255,0.05);">
+                <h5 class="text-warning font-weight-bold mb-3"><i class="fas fa-heartbeat mr-2"></i>Organ Super-Specialties</h5>
+                <p class="text-white small mb-2"><strong>Departments:</strong> Cardiology, Dermatology, Endocrinology, Gastroenterology, Neurology, Pulmonology, Nephrology, Rheumatology</p>
+                <span class="badge badge-secondary p-2">Advanced Medical PG Tracking</span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="p-3 rounded h-100" style="background: rgba(13, 21, 39, 0.5); border: 1px solid rgba(255,255,255,0.05);">
+                <h5 class="text-danger font-weight-bold mb-3"><i class="fas fa-procedures mr-2"></i>Surgical & Trauma Divisions</h5>
+                <p class="text-white small mb-2"><strong>Departments:</strong> General Surgery, Orthopedics, Neurosurgery, Obstetrics & Gynecology (OB/GYN), Ophthalmology, ENT</p>
+                <span class="badge badge-secondary p-2">Operating Theaters Bound</span>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="p-3 rounded h-100" style="background: rgba(13, 21, 39, 0.5); border: 1px solid rgba(255,255,255,0.05);">
+                <h5 class="text-success font-weight-bold mb-3"><i class="fas fa-microscope mr-2"></i>Diagnostic & Critical Support</h5>
+                <p class="text-white small mb-2"><strong>Departments:</strong> Anesthesiologists, Radiologists, Pathologists, Emergency ER Specialists, ICU Critical Care, Physiotherapy, Infectious Diseases</p>
+                <span class="badge badge-secondary p-2">25 Core ICU Ventilators Managed</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

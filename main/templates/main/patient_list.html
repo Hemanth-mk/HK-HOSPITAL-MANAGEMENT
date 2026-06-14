@@ -1,0 +1,96 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Patient Records Directory - HK Super Multi-Specialty Hospital{% endblock %}
+
+{% block contentTitle %}
+    📋 Active Hospital Records Directory
+{% endblock contentTitle %}
+
+{% block content %}
+<div class="card glass-card p-4 mb-4 shadow-lg" style="border-radius: 16px;">
+    
+    <form class="form mb-4" method="GET" id="searchFilterForm">
+        <div class="p-3 rounded border border-secondary bg-dark d-flex align-items-center flex-wrap shadow-sm" style="gap: 20px;">
+            <div class="d-flex align-items-center flex-wrap" style="gap: 15px; flex: 1;">
+                <span class="font-weight-bold text-info" style="font-size: 0.95em;">
+                    <i class="fas fa-filter mr-1"></i> Query Parameters:
+                </span>
+                <div class="clinical-filter-inputs d-flex align-items-center flex-wrap text-white" style="gap: 15px;">
+                    {{ myFilter.form }}
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-primary px-4 font-weight-bold" type="submit" style="border-radius: 8px; height: 38px;">
+                    <i class="fas fa-search mr-2"></i> Execute Filter Search
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    <div class="table-responsive">
+        <table class="table table-hover border border-secondary text-white" style="border-radius: 12px; overflow: hidden; background: rgba(15, 23, 42, 0.4);">
+            <thead class="thead-dark" style="background-color: #111827;">
+                <tr style="border-bottom: 2px solid rgba(255,255,255,0.08);">
+                    <th class="border-0">Patient Name</th>
+                    <th class="border-0">Age</th>
+                    <th class="border-0">Assigned Bed Location</th>
+                    <th class="border-0">Active Medical Diagnosis</th>
+                    <th class="border-0">Care Status Bracket</th>
+                    <th class="border-0 text-center">System Operations Ledger</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                    <td class="align-middle font-weight-bold text-white" style="font-size: 1.02em;">
+                        <i class="fas fa-user-injured mr-2 text-muted" style="font-size: 0.9em;"></i>{{ patient.name }}
+                    </td>
+                    <td class="align-middle font-weight-bold text-secondary">
+                        {{ patient.age }} Yrs
+                    </td>
+                    <td class="align-middle">
+                        <span class="badge badge-dark border border-secondary text-white p-2 px-3" style="font-family: monospace; font-size: 0.9em; border-radius: 6px;">
+                            {{ patient.bed_num.bed_number|default:"⚠️ Unallocated" }}
+                        </span>
+                    </td>
+                    <td class="align-middle font-weight-bold text-info">
+                        {{ patient.active_diagnosis }}
+                    </td>
+                    <td class="align-middle">
+                        <span class="badge p-2 px-3 font-weight-bold
+                            {% if patient.status == 'Critical' %}badge-danger
+                            {% elif patient.status == 'Recovering' %}badge-warning text-dark
+                            {% elif patient.status == 'Discharged' %}badge-success
+                            {% else %}badge-primary{% endif %}" 
+                            style="border-radius: 50px; font-size: 0.85em; letter-spacing: 0.3px;">
+                            {{ patient.status }}
+                        </span>
+                    </td>
+                    <td class="text-center align-middle">
+                        <a href="/patient/{{ patient.id }}" class="btn btn-sm btn-outline-info font-weight-bold px-3 shadow-sm" style="border-radius: 6px; border-width: 1.5px;">
+                            <i class="fas fa-file-medical-alt mr-1"></i> Open Chart Panel
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-5 bg-dark border-0">
+                        <i class="fas fa-folder-open mb-3 d-block opacity-20" style="font-size: 2.5em;"></i>
+                        <span style="font-size: 1.05em; font-weight: 500;">No active patient records matching search query parameters found.</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .clinical-filter-inputs label { font-weight: 600 !important; font-size: 0.85em !important; text-transform: uppercase !important; letter-spacing: 0.5px; color: #94a3b8 !important; margin: 0 !important; }
+    .clinical-filter-inputs input, .clinical-filter-inputs select { background-color: #090d16 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 4px 10px !important; height: 34px !important; font-size: 0.9em !important; font-weight: 600 !important; }
+    .clinical-filter-inputs p { margin: 0 !important; display: flex; align-items: center; gap: 8px; }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock content %}

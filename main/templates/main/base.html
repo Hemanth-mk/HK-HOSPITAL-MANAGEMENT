@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HK Super Multi-Specialty Hospital{% endblock %}</title>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --dark-bg: #090d16;
+            --sidebar-bg: #111827;
+            --accent-blue: #0284c7;
+            --text-main: #f8fafc;
+            --panel-glass: rgba(30, 41, 59, 0.45);
+            --border-glass: rgba(255, 255, 255, 0.06);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Side Navigation Bar Styles */
+        #sidebar {
+            min-width: 260px;
+            max-width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-glass);
+            min-height: 100vh;
+            transition: all 0.3s;
+            position: fixed;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #38bdf8, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .nav-link-custom {
+            padding: 14px 24px;
+            color: #94a3b8 !important;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none !important;
+        }
+
+        .nav-link-custom:hover, .nav-link-custom.active {
+            color: var(--text-main) !important;
+            background-color: rgba(2, 132, 199, 0.15);
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .nav-link-custom i {
+            width: 24px;
+            font-size: 1.1em;
+        }
+
+        /* Content Body Wrapper */
+        #content-wrapper {
+            width: 100%;
+            padding-left: 260px;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .glass-card {
+            background: var(--panel-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="d-flex">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h4>🏥 HK HOSPITALS</h4>
+            </div>
+            <ul class="list-unstyled pt-3">
+                <li>
+                    <a href="{% url 'dashboard' %}" class="nav-link-custom">
+                        <i class="fas fa-chart-pie mr-3 text-info"></i>Command Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'patient_list' %}" class="nav-link-custom">
+                        <i class="fas fa-folder mr-3 text-primary"></i>Patients Registry
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'add_patient' %}" class="nav-link-custom">
+                        <i class="fas fa-user-plus mr-3 text-success"></i>Admit New Patient
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'info' %}" class="nav-link-custom">
+                        <i class="fas fa-hospital-symbol mr-3 text-warning"></i>Clinical Matrix Tiers
+                    </a>
+                </li>
+                <li class="mt-5">
+                    <a href="{% url 'logout' %}" class="nav-link-custom text-danger">
+                        <i class="fas fa-sign-out-alt mr-3"></i>Terminate Session
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content-wrapper">
+            <div class="main-content">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--border-glass) !important;">
+                    <h2 class="font-weight-bold tracking-tight">
+                        {% block contentTitle %}Clinical Ecosystem Core{% endblock %}
+                    </h2>
+                    <div class="text-muted small font-weight-bold">
+                        <i class="fas fa-clock mr-2 text-primary"></i>Live Telemetry Connected
+                    </div>
+                </div>
+                
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
